@@ -1,0 +1,300 @@
+{
+  "info": {
+    "name": "Ethereal Client API",
+    "description": "Collection for testing Ethereal Python Client API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Status",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["api-docs"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Market Data",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "Get Tokens",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tokens",
+              "host": ["{{baseUrl}}"],
+              "path": ["tokens"]
+            }
+          }
+        },
+        {
+          "name": "Get Order Book",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orderbook/BTCUSD",
+              "host": ["{{baseUrl}}"],
+              "path": ["orderbook", "BTCUSD"]
+            }
+          }
+        },
+        {
+          "name": "Get Market Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/market-data/BTCUSD",
+              "host": ["{{baseUrl}}"],
+              "path": ["market-data", "BTCUSD"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account Management",
+      "item": [
+        {
+          "name": "Get Account Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/account",
+              "host": ["{{baseUrl}}"],
+              "path": ["account"]
+            }
+          }
+        },
+        {
+          "name": "Get Balances",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/balances",
+              "host": ["{{baseUrl}}"],
+              "path": ["balances"]
+            }
+          }
+        },
+        {
+          "name": "List Subaccounts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subaccounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["subaccounts"]
+            }
+          }
+        },
+        {
+          "name": "Get Default Subaccount ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subaccounts/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["subaccounts", "default"]
+            }
+          }
+        },
+        {
+          "name": "Create Subaccount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"test-subaccount\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subaccounts",
+              "host": ["{{baseUrl}}"],
+              "path": ["subaccounts"]
+            }
+          }
+        },
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/orders?subaccount_id=your_subaccount_id_here",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"],
+              "query": [
+                {
+                  "key": "subaccount_id",
+                  "value": "your_subaccount_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trading",
+      "item": [
+        {
+          "name": "Create Order - Basic Limit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_type\": \"LIMIT\",\n  \"quantity\": 0.001,\n  \"side\": 0,\n  \"price\": 30000.0,\n  \"ticker\": \"BTCUSD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Create Order - Market",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_type\": \"MARKET\",\n  \"quantity\": 0.001,\n  \"side\": 0,\n  \"ticker\": \"BTCUSD\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Create Order - Full Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_type\": \"LIMIT\",\n  \"quantity\": 0.001,\n  \"side\": 0,\n  \"price\": 30000.0,\n  \"ticker\": \"BTCUSD\",\n  \"client_order_id\": \"my-order-123\",\n  \"time_in_force\": \"GTC\",\n  \"post_only\": true,\n  \"reduce_only\": false,\n  \"dry_run\": true,\n  \"sign\": true,\n  \"submit\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Orders",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_ids\": [\"order_id_1\", \"order_id_2\"],\n  \"subaccount\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Single Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subaccount\": \"default\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/order_id_here/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "order_id_here", "cancel"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
