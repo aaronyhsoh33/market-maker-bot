@@ -6,8 +6,6 @@ A high-frequency market making bot for perpetual futures DEX platforms, built fo
 
 This market making bot is designed for **Ethereal**, a perpetual futures decentralized exchange, with a modular architecture that supports integration with other DEX platforms. The bot maintains competitive spreads, minimizes price drift, and provides configurable risk management across multiple cryptocurrency trading pairs.
 
-> **📋 Note on Proxy Architecture**: Due to signature authentication complexities with the Ethereal API, this implementation routes order operations through a local Python proxy server. The proxy leverages Ethereal's official Python SDK to handle the cryptographic signature requirements, while the main TypeScript bot focuses on market making logic. This hybrid approach ensures reliable order execution while maintaining the performance benefits of a TypeScript-based trading engine.
-
 ### Key Features
 
 - **Real-time Price Feeds**: Integrates with Pyth Network via Hermes for sub-second price updates
