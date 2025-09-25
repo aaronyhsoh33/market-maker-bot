@@ -29,7 +29,7 @@ This market making bot is designed for **Ethereal**, a perpetual futures decentr
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/aaronyhsoh33/market-maker-bot.git
 cd market-bot3
 
 # Install TypeScript dependencies
