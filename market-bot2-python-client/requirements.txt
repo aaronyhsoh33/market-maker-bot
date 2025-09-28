@@ -1,4 +1,0 @@
-ethereal-sdk
-python-dotenv
-flask
-flask-cors
