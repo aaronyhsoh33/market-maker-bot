@@ -9,7 +9,18 @@
  * @returns The rounded price
  */
 export function roundToTickSize(price: number, tickSize: number): number {
-  return Math.round(price / tickSize) * tickSize;
+  // Handle edge cases
+  if (tickSize === 0) return price;
+  if (price === 0) return 0;
+  
+  // Calculate the number of decimal places needed for the tick size
+  const tickSizeDecimalPlaces = tickSize.toString().split('.')[1]?.length || 0;
+  
+  // Round to the nearest tick size multiple
+  const rounded = Math.round(price / tickSize) * tickSize;
+  
+  // Round to the appropriate number of decimal places to match tick size precision
+  return Math.round(rounded * Math.pow(10, tickSizeDecimalPlaces)) / Math.pow(10, tickSizeDecimalPlaces);
 }
 
 /**

@@ -4,7 +4,7 @@ import { PriceSnapshotService } from './services/PriceSnapshotService';
 import { EtherealService } from './services/EtherealService';
 import { EtherealWebSocketClient } from './services/EtherealWebSocketClient';
 import { DeviationCheckService } from './services/DeviationCheckService';
-import { loadConfig, loadEtherealConfig, fetchProductInfo } from './config/marketConfig';
+import { loadConfig, loadEtherealConfig } from './config/marketConfig';
 
 async function runMarketMaker() {
   console.log('Starting Market Making Bot...');
@@ -52,16 +52,20 @@ async function runMarketMaker() {
     // Fetch product info and set up asset configurations
     console.log('Fetching product information for assets...');
     for (const asset of config.assets) {
-      const productInfo = await fetchProductInfo(asset.ticker);
+      console.log(`Fetching product info for ${asset.ticker}...`);
+      const productInfo = await etherealService.fetchProductInfo(asset.ticker);
+      console.log(`Product info for ${asset.ticker}:`, productInfo);
+      
       const enhancedAsset = {
         ...asset,
         tickSize: productInfo.tickSize,
         minQuantity: productInfo.minQuantity,
         maxQuantity: productInfo.maxQuantity,
-        productId: productInfo.productId
+        productId: productInfo.productId,
+        onchainId: productInfo.onchainId,
       };
       snapshotManager.setAssetConfig(asset.ticker, enhancedAsset);
-      console.log(`${asset.ticker}: tickSize=${productInfo.tickSize}, minQuantity=${productInfo.minQuantity}, maxQuantity=${productInfo.maxQuantity}, productId=${productInfo.productId}`);
+      console.log(`${asset.ticker}: tickSize=${productInfo.tickSize}, minQuantity=${productInfo.minQuantity}, maxQuantity=${productInfo.maxQuantity}, productId=${productInfo.productId}, onchainId=${productInfo.onchainId}`);
     }
 
     // Load existing positions

@@ -8,6 +8,7 @@ This market making bot is designed for **Ethereal**, a perpetual futures decentr
 
 ### Key Features
 
+- **Direct API Integration**: Native Ethereal API integration with EIP-712 signature generation
 - **Real-time Price Feeds**: Integrates with Pyth Network via Hermes for sub-second price updates
 - **Multi-Asset Support**: Simultaneous market making across BTC/USD, ETH/USD, SOL/USD and configurable pairs
 - **Position Awareness**: Automatically accounts for existing positions to prevent over-exposure
@@ -21,8 +22,8 @@ This market making bot is designed for **Ethereal**, a perpetual futures decentr
 ### Prerequisites
 
 - **Node.js** 18+ and npm
-- **Python** 3.8+ and pip
 - **Ethereal Account** with subaccount configuration
+- **Private Key** for EIP-712 signature generation
 - **Environment Variables** configured (see Configuration section)
 
 ### Installation
@@ -32,18 +33,17 @@ This market making bot is designed for **Ethereal**, a perpetual futures decentr
 git clone https://github.com/aaronyhsoh33/market-maker-bot.git
 cd market-bot3
 
-# Install TypeScript dependencies
+# Install dependencies
 npm install
 
-# Build the TypeScript project
+# Build the project
 npm run build
 ```
 
 ### Configuration
 
-The bot requires configuration for both the TypeScript application and Python API proxy:
+The bot requires configuration through environment variables:
 
-#### 1. Main Application Configuration
 ```bash
 # Copy the example environment file
 cp .env.example .env
@@ -52,45 +52,10 @@ cp .env.example .env
 nano .env
 ```
 
-#### 2. Python API Proxy Configuration
-```bash
-# Navigate to Python client directory
-cd market-bot2-python-client
-
-# Copy Python environment template
-cp .env.example .env
-
-# Configure Python client credentials
-nano .env
-
-# Return to main directory
-cd ..
-```
-
-### 🎯 One-Command Startup
-
-The easiest way to start the complete market making system:
+### 🎯 Starting the Bot
 
 ```bash
-# Start everything automatically
-npm run start:all
-```
-
-This single command will:
-- ✅ Set up Python virtual environment
-- ✅ Install Python dependencies
-- ✅ Start Python API proxy server (port 8080)
-- ✅ Build TypeScript application
-- ✅ Start market making bot
-- ✅ Display service status and URLs
-
-### Individual Service Management
-
-```bash
-# Start only Python API proxy server
-npm run start:python
-
-# Start only TypeScript bot (requires Python server running)
+# Start the market making bot
 npm start
 
 # Development mode with auto-reload
@@ -98,33 +63,7 @@ npm run dev
 
 # Check service health and status
 npm run status
-
-# Stop all services gracefully
-npm run stop:all
 ```
-
-### 📊 Service Monitoring
-
-```bash
-# Check if services are running and healthy
-npm run status
-
-# Example output:
-# ✅ Python API Server is running on port 8080
-# ✅ Python API Server health check PASSED
-# ✅ TypeScript Market Bot processes found
-# 🎉 All core services are healthy!
-```
-
-### 🔗 Service URLs
-
-Once started, access these endpoints:
-
-- **Python API Server**: http://localhost:8080
-- **API Documentation**: http://localhost:8080/api-docs
-- **Health Check**: http://localhost:8080/health
-
-📖 **For detailed startup instructions and troubleshooting, see [STARTUP.md](./STARTUP.md)**
 
 ## ⚙️ Configuration
 
@@ -167,7 +106,6 @@ SOL_USD_SPREAD_WIDTH=15           # Widest spread for SOL (15 bp)
 
 ```bash
 # Ethereal API endpoints
-ETHEREAL_LOCAL_BASE_URL=http://localhost:8080    # Local proxy for orders
 ETHEREAL_API_BASE_URL=https://api.etherealtest.net/v1  # Direct API access
 ETHEREAL_WS_URL=wss://ws.etherealtest.net/v1/stream    # WebSocket endpoint
 ETHEREAL_TIMEOUT=10000                           # Request timeout (ms)
@@ -175,6 +113,7 @@ ETHEREAL_TIMEOUT=10000                           # Request timeout (ms)
 # Account configuration
 ETHEREAL_SUBACCOUNT_ID=your-subaccount-id-here   # Your subaccount UUID
 ETHEREAL_SUBACCOUNT=0x7072696d61727900000000000000000000000000000000000000000000000000  # Hex-encoded subaccount
+ETHEREAL_PRIVATE_KEY=your-private-key-here       # Private key for EIP-712 signatures
 ```
 
 #### **Price Feed Configuration**
@@ -206,25 +145,23 @@ BTC_USD_ORDER_SIZE=0.01           # Larger position sizes
 
 ### System Overview
 
-The market making bot uses a dual-stack architecture combining Python and TypeScript for optimal performance and API compatibility:
+The market making bot uses a streamlined TypeScript-only architecture with direct API integration:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Market Making Bot System                    │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  ┌─────────────────┐    ┌──────────────────┐                   │
-│  │   TypeScript    │    │   Python API     │                   │
-│  │  Market Bot     │───▶│   Proxy Server   │                   │
-│  │ (Core Logic)    │    │ (Authentication) │                   │
-│  │                 │    │  Port: 8080      │                   │
-│  └─────────────────┘    └──────────────────┘                   │
-│           │                       │                            │
-│           ▼                       ▼                            │
-│  ┌─────────────────┐    ┌──────────────────┐                   │
-│  │ Price Feeds     │    │ Ethereal DEX     │                   │
-│  │ (Pyth/Hermes)   │    │ Trading API      │                   │
-│  └─────────────────┘    └──────────────────┘                   │
+│  ┌─────────────────────────────────────────────────────────────┐ │
+│  │                TypeScript Market Bot                        │ │
+│  │              (Core Logic + API Integration)                 │ │
+│  │                                                             │ │
+│  │  ┌─────────────────┐    ┌──────────────────┐               │ │
+│  │  │ Price Feeds     │    │ Ethereal DEX     │               │ │
+│  │  │ (Pyth/Hermes)   │    │ Trading API      │               │ │
+│  │  │                 │    │ (Direct EIP-712) │               │ │
+│  │  └─────────────────┘    └──────────────────┘               │ │
+│  └─────────────────────────────────────────────────────────────┘ │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -236,7 +173,7 @@ The market making bot uses a dual-stack architecture combining Python and TypeSc
 │   Price Feeds   │    │   Market Making  │    │   Exchange      │
 │                 │    │     Engine       │    │   Integration   │
 │ HermesPriceClient│───▶│PriceSnapshotService│◀──│ EtherealService │
-│ (Pyth Network)  │    │                  │    │ → Python Proxy │
+│ (Pyth Network)  │    │                  │    │ (Direct API)    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                               │                          │
                               ▼                          ▼
@@ -251,7 +188,7 @@ The market making bot uses a dual-stack architecture combining Python and TypeSc
 
 - **PriceSnapshotService**: Core orchestration, order management, position tracking
 - **HermesPriceClient**: Real-time price feeds from Pyth Network via Hermes
-- **EtherealService**: Order execution and account management on Ethereal DEX
+- **EtherealService**: Direct order execution and account management on Ethereal DEX with EIP-712 signatures
 - **EtherealWebSocketClient**: Real-time order status and fill notifications
 - **DeviationCheckService**: Risk management and price deviation monitoring
 
@@ -281,22 +218,14 @@ npm install
 cp .env.example .env
 nano .env
 
-# Python proxy config
-cd market-bot2-python-client
-cp .env.example .env
-nano .env
-cd ..
 ```
 
 **3. Development Mode:**
 ```bash
-# Terminal 1: Start Python proxy (keep running)
-npm run start:python
-
-# Terminal 2: Develop TypeScript bot with auto-reload
+# Develop with auto-reload
 npm run dev
 
-# Terminal 3: Monitor service health
+# Monitor service health
 watch -n 5 npm run status
 ```
 
@@ -318,9 +247,6 @@ npm test -- tests/services/PriceSnapshotService.test.ts
 npm run build
 npm run start:all
 
-# Or use individual services for container deployment
-npm run start:python  # Container 1
-npm start             # Container 2
 ```
 
 ### 🚀 Quick Development Commands
@@ -328,40 +254,30 @@ npm start             # Container 2
 ```bash
 # Development essentials
 npm run dev           # TypeScript auto-reload
-npm run start:python  # Python proxy for development
 npm run status        # Health check
-npm run stop:all      # Clean shutdown
 
 # Testing and validation
 npm test             # Unit tests
 npm run build        # Production build
-npm run start:all    # Full stack test
+npm start            # Start the bot
 ```
 
 ## 📊 Monitoring and Operations
 
 ### Startup Sequence Logging
 
-When using `npm run start:all`, you'll see this startup sequence:
+When starting the bot, you'll see this startup sequence:
 
 ```bash
-🚀 Starting Market Making Bot Full Stack
+🚀 Starting Market Making Bot
 ==================================================
-[INFO] Starting Python API server...
-[INFO] Creating Python virtual environment...
-[INFO] Installing Python dependencies...
-[SUCCESS] Python API server started successfully (PID: 12345)
 [INFO] Building TypeScript bot...
 [SUCCESS] TypeScript bot built successfully
 [INFO] Starting TypeScript market making bot...
 [SUCCESS] TypeScript bot started (PID: 67890)
 
-🎉 All services started successfully!
+🎉 Market Making Bot started successfully!
 ==================================================
-Python API Server: http://localhost:8080
-API Documentation: http://localhost:8080/api-docs
-Health Check: http://localhost:8080/health
-
 Market Making Bot: Running with PID 67890
 ==================================================
 ```
@@ -393,10 +309,9 @@ npm run status
 # Example healthy output:
 🔍 Checking Market Making Bot Services
 ==================================================
-✅ Python API Server is running on port 8080
-✅ Python API Server health check PASSED
 ✅ TypeScript Market Bot processes found
-🎉 All core services are healthy!
+✅ Ethereal API connectivity verified
+🎉 Market making bot is healthy!
 ```
 
 ### Key Metrics to Monitor
@@ -585,15 +500,11 @@ npm run stop:all
 lsof -ti:8080 | xargs kill -9
 ```
 
-**Python Dependencies Issues:**
+**Dependencies Issues:**
 ```bash
-# Navigate to Python client and reinstall
-cd market-bot2-python-client
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cd ..
+# Clean and reinstall Node.js dependencies
+rm -rf node_modules package-lock.json
+npm install
 ```
 
 **TypeScript Build Errors:**
@@ -606,13 +517,11 @@ npm run build
 
 **Environment Configuration Issues:**
 ```bash
-# Ensure both .env files exist and are configured
+# Ensure .env file exists and is configured
 ls -la .env                              # Main config
-ls -la market-bot2-python-client/.env    # Python config
 
-# Check example files if needed
+# Check example file if needed
 cat .env.example
-cat market-bot2-python-client/.env.example
 ```
 
 **Services Won't Start:**
@@ -633,13 +542,13 @@ ps aux       # Running processes
 - Check Ethereal subaccount configuration
 - Verify price feed connectivity with `npm run status`
 - Ensure sufficient account balance
-- Check Python proxy is responding: `curl http://localhost:8080/health`
+- Check Ethereal API connectivity: `curl -s https://api.etherealtest.net/v1/health`
 
 **Orders getting rejected:**
 - Verify tick size compliance (prices must be multiples of tickSize)
 - Check minimum quantity requirements
 - Confirm order expiration times are valid
-- Review Python proxy logs: `tail -f market-bot2-python-client/python_server.log`
+- Review bot logs for detailed error messages
 
 **High cancellation rate:**
 - Increase `MAX_PRICE_DEVIATION` threshold
@@ -657,8 +566,8 @@ ps aux       # Running processes
 curl -s https://hermes.pyth.network  # Pyth price feeds
 curl -s https://api.etherealtest.net/v1  # Ethereal API
 
-# Check local services
-curl -s http://localhost:8080/health  # Python proxy health
+# Check external services
+curl -s https://api.etherealtest.net/v1/health  # Ethereal API health
 ```
 
 ### Service Recovery
@@ -669,11 +578,10 @@ curl -s http://localhost:8080/health  # Python proxy health
 npm run stop:all
 
 # Clean up any orphaned processes
-pkill -f "python.*start_server"
 pkill -f "node.*dist/index"
 
 # Clean build artifacts
-rm -rf dist node_modules market-bot2-python-client/venv
+rm -rf dist node_modules
 
 # Fresh installation
 npm install
@@ -682,9 +590,6 @@ npm run start:all
 
 **Logs and Debugging:**
 ```bash
-# Python server logs
-tail -f market-bot2-python-client/python_server.log
-
 # Run TypeScript in debug mode
 DEBUG=* npm run dev
 

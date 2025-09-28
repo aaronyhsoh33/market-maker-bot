@@ -36,3 +36,17 @@ export function generateExpiresAt(minutesFromNow: number): number {
 export function convertSideToNumber(side: 'BUY' | 'SELL'): 0 | 1 {
   return side === 'BUY' ? 0 : 1;
 }
+
+/**
+ * Parses a signature type string into an array of name and type pairs
+ * @param typeString Signature type string
+ * @returns Array of name and type pairs
+ * @example
+ * parseSignatureType('address sender,uint64 nonce') // returns [{name: 'sender', type: 'address'}, {name: 'nonce', type: 'uint64'}]
+ */
+export function parseSignatureType(typeString: string): Array<{name: string, type: string}> {
+  return typeString.split(',').map(field => {
+    const [type, name] = field.trim().split(' ');
+    return { name, type };
+  });
+}

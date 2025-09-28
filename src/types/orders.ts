@@ -38,6 +38,8 @@ export interface CreateOrderRequest {
   time_in_force: TimeInForce;
   /** Expiration timestamp for GTD orders (Unix seconds) */
   expires_at?: number; // Required for GTD orders (timestamp)
+  /** Onchain ID */
+  onchainId: number;
 }
 
 /**

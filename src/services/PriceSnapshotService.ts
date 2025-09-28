@@ -519,18 +519,19 @@ export class PriceSnapshotService {
       price: roundToTickSize(bidPrice, tickSize),
       ticker,
       time_in_force: 'GTD',
-      expires_at: generateExpiresAt(5) // 5 minutes
+      expires_at: generateExpiresAt(5), // 5 minutes
+      onchainId: config.onchainId
     };
 
     console.log(`[${ticker}] Creating bid order at $${bidOrder.price} for ${bidOrder.quantity}`);
 
     const response = await this.etherealService!.placeOrder(bidOrder);
 
-    if (response?.order?.id) {
+    if (response?.id) {
       // Update trading pair with new bid order
       const tradingPair = this.tradingPairs.get(ticker) || { ticker };
       tradingPair.bidOrder = {
-        id: response.order.id,
+        id: response.id,
         ticker,
         side: 'BID',
         price: bidOrder.price!,
@@ -554,17 +555,18 @@ export class PriceSnapshotService {
       price: roundToTickSize(askPrice, tickSize),
       ticker,
       time_in_force: 'GTD',
-      expires_at: generateExpiresAt(5) // 5 minutes
+      expires_at: generateExpiresAt(5), // 5 minutes
+      onchainId: config.onchainId
     };
 
     console.log(`[${ticker}] Creating ask order at $${askOrder.price} for ${askOrder.quantity}`);
 
     const response = await this.etherealService!.placeOrder(askOrder);
 
-    if (response?.order?.id) {
+    if (response?.id) {
       const tradingPair = this.tradingPairs.get(ticker) || { ticker };
       tradingPair.askOrder = {
-        id: response.order.id,
+        id: response.id,
         ticker,
         side: 'ASK',
         price: askOrder.price!,

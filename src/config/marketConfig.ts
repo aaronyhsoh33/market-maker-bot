@@ -1,4 +1,3 @@
-import axios from 'axios';
 
 /**
  * Market making configuration system
@@ -31,6 +30,8 @@ export interface AssetConfig {
   maxQuantity?: number;
   /** Exchange product ID for API calls (from exchange) */
   productId?: string;
+  /** Onchain ID for Ethereal API calls */
+  onchainId: number;
 }
 
 /**
@@ -83,7 +84,8 @@ export const loadConfig = (): MarketMakingConfig => {
       ticker,
       orderSize: parseFloat(process.env[`${envPrefix}_ORDER_SIZE`] || '100'),
       spreadWidth: parseFloat(process.env[`${envPrefix}_SPREAD_WIDTH`] || process.env.SPREAD_WIDTH || '10'),
-      maxPriceDeviation: parseFloat(process.env[`${envPrefix}_MAX_PRICE_DEVIATION`] || process.env.MAX_PRICE_DEVIATION || '1.0')
+      maxPriceDeviation: parseFloat(process.env[`${envPrefix}_MAX_PRICE_DEVIATION`] || process.env.MAX_PRICE_DEVIATION || '1.0'),
+      onchainId: 1 // Default value, will be updated by fetchProductInfo
     };
   });
 
@@ -99,6 +101,7 @@ export const loadConfig = (): MarketMakingConfig => {
  * Supports dual API configuration:
  * - localBaseUrl: Local proxy/gateway for order operations (lower latency)
  * - apiBaseUrl: Direct Ethereal API for data queries and account operations
+ * - subaccount: Subaccount identifier for orders
  *
  * @returns Ethereal API configuration object
  */
@@ -106,57 +109,7 @@ export const loadEtherealConfig = () => {
   return {
     localBaseUrl: process.env.ETHEREAL_LOCAL_BASE_URL || 'http://127.0.0.1',
     apiBaseUrl: process.env.ETHEREAL_API_BASE_URL || 'https://api.etherealtest.net/v1',
-    timeout: parseInt(process.env.ETHEREAL_TIMEOUT || '10000')
+    timeout: parseInt(process.env.ETHEREAL_TIMEOUT || '10000'),
+    subaccount: process.env.ETHEREAL_SUBACCOUNT || '0x0000000000000000000000000000000000000000000000000000000000000000'
   };
-};
-
-/**
- * Fetches trading pair specifications from Ethereal exchange
- *
- * Retrieves critical trading parameters needed for order placement:
- * - tickSize: Minimum price increment (needed for valid order prices)
- * - minQuantity: Minimum order size (prevents rejected orders)
- * - maxQuantity: Maximum order size (prevents rejected orders)
- * - productId: Exchange identifier (needed for position queries)
- *
- * This function is typically called during bot initialization to populate
- * AssetConfig objects with exchange-specific constraints.
- *
- * Error Handling:
- * - Returns sensible defaults if API call fails
- * - Logs errors but doesn't crash the application
- * - Allows bot to start even if some product info is unavailable
- *
- * @param ticker Trading pair symbol (e.g., 'BTCUSD')
- * @returns Product specification object with trading constraints
- * @throws Never throws - returns defaults on any error
- */
-export const fetchProductInfo = async (ticker: string): Promise<{tickSize: number, minQuantity: number, maxQuantity: number, productId: string}> => {
-  const etherealConfig = loadEtherealConfig();
-  const url = `${etherealConfig.apiBaseUrl}/product?ticker=${ticker}`;
-
-  try {
-    const response = await axios.get(url, { timeout: etherealConfig.timeout });
-
-    if (response.data && response.data.data && response.data.data.length > 0) {
-      const product = response.data.data[0];
-      return {
-        tickSize: parseFloat(product.tickSize),
-        minQuantity: parseFloat(product.minQuantity),
-        maxQuantity: parseFloat(product.maxQuantity),
-        productId: product.id
-      };
-    } else {
-      throw new Error(`No product data found for ${ticker}`);
-    }
-  } catch (error) {
-    console.error(`Error fetching product info for ${ticker}:`, error);
-    // Return defaults if API call fails - allows bot to continue running
-    return {
-      tickSize: 1,
-      minQuantity: 0.0001,
-      maxQuantity: 1000000,
-      productId: ''
-    };
-  }
 };
