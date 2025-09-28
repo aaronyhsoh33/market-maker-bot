@@ -6,8 +6,6 @@ A high-frequency market making bot for perpetual futures DEX platforms, built fo
 
 This market making bot is designed for **Ethereal**, a perpetual futures decentralized exchange, with a modular architecture that supports integration with other DEX platforms. The bot maintains competitive spreads, minimizes price drift, and provides configurable risk management across multiple cryptocurrency trading pairs.
 
-> **🚀 Direct API Integration**: This implementation uses direct Ethereal API integration with EIP-712 signature generation, eliminating the need for external proxy services. The bot handles all cryptographic operations natively in TypeScript, providing better performance and simplified deployment.
-
 ### Key Features
 
 - **Direct API Integration**: Native Ethereal API integration with EIP-712 signature generation
@@ -32,7 +30,7 @@ This market making bot is designed for **Ethereal**, a perpetual futures decentr
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/aaronyhsoh33/market-maker-bot.git
 cd market-bot3
 
 # Install dependencies
