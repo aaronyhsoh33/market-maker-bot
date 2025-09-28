@@ -131,7 +131,7 @@ export const loadEtherealConfig = () => {
  * @returns Product specification object with trading constraints
  * @throws Never throws - returns defaults on any error
  */
-export const fetchProductInfo = async (ticker: string): Promise<{tickSize: number, minQuantity: number, maxQuantity: number, productId: string}> => {
+export const fetchProductInfo = async (ticker: string): Promise<{tickSize: number, minQuantity: number, maxQuantity: number, productId: string, onchainId: string}> => {
   const etherealConfig = loadEtherealConfig();
   const url = `${etherealConfig.apiBaseUrl}/product?ticker=${ticker}`;
 
@@ -144,19 +144,15 @@ export const fetchProductInfo = async (ticker: string): Promise<{tickSize: numbe
         tickSize: parseFloat(product.tickSize),
         minQuantity: parseFloat(product.minQuantity),
         maxQuantity: parseFloat(product.maxQuantity),
-        productId: product.id
+        productId: product.id,
+        onchainId: product.onchainId
       };
     } else {
       throw new Error(`No product data found for ${ticker}`);
     }
   } catch (error) {
     console.error(`Error fetching product info for ${ticker}:`, error);
-    // Return defaults if API call fails - allows bot to continue running
-    return {
-      tickSize: 1,
-      minQuantity: 0.0001,
-      maxQuantity: 1000000,
-      productId: ''
-    };
+    // throw error
+    throw error;
   }
 };

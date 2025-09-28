@@ -58,7 +58,8 @@ async function runMarketMaker() {
         tickSize: productInfo.tickSize,
         minQuantity: productInfo.minQuantity,
         maxQuantity: productInfo.maxQuantity,
-        productId: productInfo.productId
+        productId: productInfo.productId,
+        onchainId: productInfo.onchainId,
       };
       snapshotManager.setAssetConfig(asset.ticker, enhancedAsset);
       console.log(`${asset.ticker}: tickSize=${productInfo.tickSize}, minQuantity=${productInfo.minQuantity}, maxQuantity=${productInfo.maxQuantity}, productId=${productInfo.productId}`);
