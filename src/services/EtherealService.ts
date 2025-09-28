@@ -387,9 +387,6 @@ export class EtherealService implements IOrderService {
       // Get wallet address for sender
       const wallet = new ethers.Wallet(this.privateKey);
       
-      // Get product ID from ticker mapping or use default
-      const productId = this.config.productIdMap?.[orderRequest.ticker] || 0;
-      
       // Get subaccount from config or use default
       const subaccount = this.config.subaccount || '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -401,7 +398,7 @@ export class EtherealService implements IOrderService {
         type: orderRequest.order_type,
         quantity: orderRequest.quantity.toString(),
         side: orderRequest.side,
-        onchainId: productId,
+        onchainId: orderRequest.onchainId,
         engineType: 0,
         reduceOnly: false,
         close: false,
@@ -412,7 +409,15 @@ export class EtherealService implements IOrderService {
         clientOrderId: orderRequest.client_order_id
       };
 
-      return await this.submitOrderInternal(etherealOrderData);
+      // Create signature and submit order
+      const signature = await this.createSignature(etherealOrderData);
+      const orderRequestData: EtherealOrderRequest = {
+        data: etherealOrderData,
+        signature
+      };
+
+      const response = await this.client.post('/order', orderRequestData);
+      return response.data;
     } catch (error) {
       console.error('Error placing order:', error);
       throw error;
@@ -459,6 +464,42 @@ export class EtherealService implements IOrderService {
   }
 
   /**
+   * Fetch product information for a given ticker
+   *
+   * @param ticker The ticker symbol (e.g., 'BTCUSD')
+   * @returns Product information including onchainId, tickSize, etc.
+   */
+  async fetchProductInfo(ticker: string): Promise<{tickSize: number, minQuantity: number, maxQuantity: number, productId: string, onchainId: number}> {
+    const url = `/product?ticker=${ticker}`;
+
+    try {
+      console.log(`Fetching product info from: ${this.client.defaults.baseURL}${url}`);
+      const response = await this.client.get(url);
+      console.log(`Product API response for ${ticker}:`, JSON.stringify(response.data, null, 2));
+
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        const product = response.data.data[0];
+        console.log(`Product data for ${ticker}:`, product);
+        
+        const result = {
+          tickSize: parseFloat(product.tickSize),
+          minQuantity: parseFloat(product.minQuantity),
+          maxQuantity: parseFloat(product.maxQuantity),
+          productId: product.id,
+          onchainId: parseInt(product.onchainId)
+        };
+        console.log(`Parsed product info for ${ticker}:`, result);
+        return result;
+      } else {
+        throw new Error(`No product data found for ${ticker}`);
+      }
+    } catch (error) {
+      console.error(`Error fetching product info for ${ticker}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Check overall health of API endpoint
    *
    * Ensures trading capabilities are operational before allowing market making activities to proceed.
@@ -491,51 +532,4 @@ export class EtherealService implements IOrderService {
       throw error;
     }
   }
-
-  /**
-   * Internal method to submit order to Ethereal API
-   *
-   * @param orderData Order data (signature will be generated automatically)
-   * @returns API response
-   * @throws Error if request fails
-   */
-  private async submitOrderInternal(orderData: EtherealOrderData): Promise<any> {
-    try {
-      const signature = await this.createSignature(orderData);
-      const orderRequest: EtherealOrderRequest = {
-        data: orderData,
-        signature
-      };
-
-      const response = await this.client.post('/order', orderRequest);
-      return response.data;
-    } catch (error) {
-      console.error('Error submitting order to Ethereal API:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Cancel order on Ethereal API via POST /v1/cancel (direct method)
-   *
-   * @param cancelData Cancel order data (signature will be generated automatically)
-   * @returns API response
-   * @throws Error if request fails
-   */
-  async cancelOrderDirect(cancelData: EtherealCancelOrderData): Promise<any> {
-    try {
-      const signature = await this.createCancelSignature(cancelData);
-      const cancelRequest: EtherealCancelOrderRequest = {
-        data: cancelData,
-        signature
-      };
-
-      const response = await this.client.post('/order/cancel', cancelRequest);
-      return response.data;
-    } catch (error) {
-      console.error('Error cancelling order on Ethereal API:', error);
-      throw error;
-    }
-  }
-
 }
